@@ -1,0 +1,57 @@
+name: Validate Repository Structure
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-structure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check /docs folder exists
+        run: |
+          if [ ! -d "docs" ]; then
+            echo "ERROR: /docs folder is missing."
+            exit 1
+          fi
+          echo "OK: /docs folder found."
+
+      - name: Check ERD file exists
+        run: |
+          if [ ! -f "docs/raceday_erd.drawio" ] && [ ! -f "docs/raceday_erd.png" ] && [ ! -f "docs/raceday_erd.pdf" ]; then
+            echo "ERROR: ERD file (drawio/png/pdf) not found in /docs."
+            exit 1
+          fi
+          echo "OK: ERD file found."
+
+      - name: Check API endpoint plan exists
+        run: |
+          if [ ! -f "docs/api_endpoint_plan.md" ] && [ ! -f "docs/api_endpoint_plan.pdf" ]; then
+            echo "ERROR: API endpoint plan (md/pdf) not found in /docs."
+            exit 1
+          fi
+          echo "OK: API endpoint plan found."
+
+      - name: Check SQL script exists
+        run: |
+          if [ ! -f "docs/raceday_schema.sql" ]; then
+            echo "ERROR: raceday_schema.sql not found in /docs."
+            exit 1
+          fi
+          echo "OK: SQL script found."
+
+      - name: Check README exists
+        run: |
+          if [ ! -f "README.md" ]; then
+            echo "ERROR: README.md not found."
+            exit 1
+          fi
+          echo "OK: README.md found."
+
+      - name: Structure validation passed
+        run: echo "All required Part 1 files are present."
