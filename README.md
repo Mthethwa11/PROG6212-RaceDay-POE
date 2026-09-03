@@ -1,5 +1,7 @@
 # RaceDay — Event Management System
 
+[![Validate Repository Structure](https://github.com/Mthethwa11/PROG6212-RaceDay-POE/actions/workflows/validate-structure.yml/badge.svg)](https://github.com/Mthethwa11/PROG6212-RaceDay-POE/actions/workflows/validate-structure.yml)
+
 ## PROG6212 Portfolio of Evidence — Part 1: System Planning and Database
 
 ## About the System
