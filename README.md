@@ -27,12 +27,18 @@ The system supports two distinct user roles, enforced consistently across all th
 
 ```
 /docs
-  raceday_erd.drawio      - Entity Relationship Diagram (draw.io source file)
-  raceday_erd.png         - Exported ERD image
-  api_endpoint_plan.md    - Full API endpoint plan
-  raceday_schema.sql      - SQL script (creates and seeds the database)
-README.md                 - This file
-```
+  raceday_erd.drawio       - Entity Relationship Diagram (draw.io source file)
+  raceday_erd.png          - Exported ERD image
+  api_endpoint_plan.md     - Full API endpoint plan
+  raceday_schema.sql       - SQL script (creates and seeds the database)
+  data_dictionary.md       - Column-level reference for every table
+  assumptions.md           - Design assumptions made during planning
+  ci_cd_success.png        - Screenshot of passing CI/CD workflow
+.github/workflows/
+  validate-structure.yml   - CI workflow validating repo structure
+.gitattributes             - Line ending normalization rules
+LICENSE                    - MIT license
+README.md                  - This file
 
 ## Database Setup Instructions
 
