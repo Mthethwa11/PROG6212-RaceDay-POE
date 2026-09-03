@@ -1,182 +1,185 @@
 /* =========================================================
-   DATA6222 Practical Assignment - Art Gallery Database
-   Full T-SQL Script (Microsoft SQL Server syntax)
+   RaceDay Database Schema
+   PROG6212 POE - Part 1, Section C
+   Run in SQL Server Management Studio (SSMS) against a clean
+   SQL Server Express instance.
    ========================================================= */
 
-/* ================= STEP 1: CREATE DATABASE & TABLES ================= */
-
-CREATE DATABASE ArtGalleryDB;
+IF DB_ID('RaceDayDB') IS NULL
+BEGIN
+    CREATE DATABASE RaceDayDB;
+END
 GO
 
-USE ArtGalleryDB;
+USE RaceDayDB;
 GO
 
-CREATE TABLE Genre (
-    GenreID     INT IDENTITY(1,1) PRIMARY KEY,
-    Description VARCHAR(100) NOT NULL
-);
+/* Drop tables if they exist, in FK-safe order, so this script
+   can be re-run cleanly on a database that already has them. */
+IF OBJECT_ID('dbo.Results', 'U') IS NOT NULL DROP TABLE dbo.Results;
+IF OBJECT_ID('dbo.Enrolments', 'U') IS NOT NULL DROP TABLE dbo.Enrolments;
+IF OBJECT_ID('dbo.Routes', 'U') IS NOT NULL DROP TABLE dbo.Routes;
+IF OBJECT_ID('dbo.Categories', 'U') IS NOT NULL DROP TABLE dbo.Categories;
+IF OBJECT_ID('dbo.Events', 'U') IS NOT NULL DROP TABLE dbo.Events;
+IF OBJECT_ID('dbo.Users', 'U') IS NOT NULL DROP TABLE dbo.Users;
+GO
 
-CREATE TABLE Artist (
-    ArtistID INT IDENTITY(1,1) PRIMARY KEY,
-    Name     VARCHAR(50) NOT NULL,
-    Surname  VARCHAR(50) NOT NULL
-);
-
-CREATE TABLE Artwork (
-    ArtworkID INT IDENTITY(1,1) PRIMARY KEY,
-    GenreID   INT NOT NULL,
-    ArtistID  INT NOT NULL,
-    Title     VARCHAR(150) NOT NULL,
-    CONSTRAINT FK_Artwork_Genre  FOREIGN KEY (GenreID)  REFERENCES Genre(GenreID),
-    CONSTRAINT FK_Artwork_Artist FOREIGN KEY (ArtistID) REFERENCES Artist(ArtistID)
-);
-
-CREATE TABLE Exhibition (
-    ExhibitionID INT IDENTITY(1,1) PRIMARY KEY,
-    Description  VARCHAR(150) NOT NULL
-);
-
-CREATE TABLE Entry (
-    EntryID      INT IDENTITY(1,1) PRIMARY KEY,
-    ArtworkID    INT NOT NULL,
-    ExhibitionID INT NOT NULL,
-    CONSTRAINT FK_Entry_Artwork    FOREIGN KEY (ArtworkID)    REFERENCES Artwork(ArtworkID),
-    CONSTRAINT FK_Entry_Exhibition FOREIGN KEY (ExhibitionID) REFERENCES Exhibition(ExhibitionID)
+/* =========================================================
+   TABLE: Users
+   Holds both roles ('Organiser' and 'Participant').
+   ========================================================= */
+CREATE TABLE dbo.Users (
+    UserId          INT IDENTITY(1,1)   NOT NULL,
+    FullName        VARCHAR(100)        NOT NULL,
+    Email           VARCHAR(150)        NOT NULL,
+    PasswordHash    VARCHAR(255)        NOT NULL,
+    Role            VARCHAR(20)         NOT NULL,
+    CreatedAt       DATETIME            NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT PK_Users PRIMARY KEY (UserId),
+    CONSTRAINT UQ_Users_Email UNIQUE (Email),
+    CONSTRAINT CK_Users_Role CHECK (Role IN ('Organiser', 'Participant'))
 );
 GO
 
-
-/* ================= STEP 2: POPULATE THE DATABASE ================= */
-
--- Genre (5 records)
-INSERT INTO Genre (Description) VALUES
-('Abstract'), ('Impressionism'), ('Surrealism'), ('Portraiture'), ('Landscape');
-
--- Artist (6 records)
-INSERT INTO Artist (Name, Surname) VALUES
-('Thandiwe', 'Mokoena'), ('Liam', 'Bennett'), ('Aiko', 'Tanaka'),
-('Carlos', 'Rivera'), ('Naledi', 'Dlamini'), ('Sofia', 'Rossi');
-
--- Artwork (22 records)
-INSERT INTO Artwork (GenreID, ArtistID, Title) VALUES
-(1, 1, 'Fractured Horizon'), (1, 2, 'Silent Geometry'), (1, 3, 'Chaos Theory'),
-(2, 1, 'Morning at the Harbour'), (2, 4, 'Sunlit Fields'), (2, 5, 'Reflections on the Lake'),
-(3, 3, 'Dreaming Machines'), (3, 6, 'The Melting Clock'), (3, 2, 'Whispers of the Subconscious'),
-(4, 1, 'Portrait of a Stranger'), (4, 5, 'The Old Fisherman'), (4, 4, 'Woman in Blue'),
-(5, 6, 'Valley at Dusk'), (5, 2, 'Mountains Beyond'), (5, 3, 'The Quiet River'),
-(1, 4, 'Concrete Dreams'), (2, 6, 'Golden Wheatfield'), (3, 1, 'Floating City'),
-(4, 3, 'Self Reflection'), (5, 5, 'Autumn Path'), (1, 5, 'Broken Symmetry'), (2, 3, 'Coastal Light');
-
--- Exhibition (16 records)
-INSERT INTO Exhibition (Description) VALUES
-('Spring Contemporary Showcase'), ('Durban Art Fair'), ('New Voices in Art'),
-('The Colour of Emotion'), ('Modernist Perspectives'), ('Cape Town Biennale'),
-('Emerging Artists Exhibit'), ('Reflections: A Group Show'), ('Abstract Visions'),
-('Portraits of Our Time'), ('Nature Reimagined'), ('Surreal Worlds'),
-('Winter Salon'), ('Coastal Impressions'), ('The Human Form'), ('Gallery 21 Annual Show');
-
--- Entry (25 records; ArtworkID 1, 4 and 21 each entered in more than 1 exhibition)
-INSERT INTO Entry (ArtworkID, ExhibitionID) VALUES
-(1, 1), (1, 9), (2, 1), (3, 9), (4, 2), (4, 14), (5, 2), (6, 14), (7, 12), (8, 12),
-(9, 3), (10, 10), (11, 10), (12, 15), (13, 11), (14, 5), (15, 11), (16, 9), (17, 8),
-(18, 12), (19, 10), (20, 11), (21, 16), (21, 6), (22, 8);
+/* =========================================================
+   TABLE: Events
+   Created and owned by a User with Role = 'Organiser'.
+   ========================================================= */
+CREATE TABLE dbo.Events (
+    EventId         INT IDENTITY(1,1)   NOT NULL,
+    OrganiserId     INT                 NOT NULL,
+    Name            VARCHAR(150)        NOT NULL,
+    Description     VARCHAR(MAX)        NULL,
+    EventDate       DATE                NOT NULL,
+    Location        VARCHAR(150)        NOT NULL,
+    CreatedAt       DATETIME            NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT PK_Events PRIMARY KEY (EventId),
+    CONSTRAINT FK_Events_Users FOREIGN KEY (OrganiserId)
+        REFERENCES dbo.Users (UserId)
+);
 GO
 
-
-/* ================= STEP 3: UPDATE STATEMENT ================= */
-
--- Demonstrates the UPDATE statement: correcting an artist's surname
-SELECT * FROM Artist WHERE ArtistID = 1;   -- check the record before updating
-
-UPDATE Artist
-SET Surname = 'Mokoena-Ndlovu'
-WHERE ArtistID = 1;
-
-SELECT * FROM Artist WHERE ArtistID = 1;   -- confirm the update
+/* =========================================================
+   TABLE: Categories
+   Each Event has one or more race Categories (e.g. 10km Run).
+   ========================================================= */
+CREATE TABLE dbo.Categories (
+    CategoryId      INT IDENTITY(1,1)   NOT NULL,
+    EventId         INT                 NOT NULL,
+    Name            VARCHAR(100)        NOT NULL,
+    DistanceKm      DECIMAL(5,2)        NOT NULL,
+    Price           DECIMAL(8,2)        NOT NULL DEFAULT 0,
+    MaxParticipants INT                 NOT NULL,
+    CONSTRAINT PK_Categories PRIMARY KEY (CategoryId),
+    CONSTRAINT FK_Categories_Events FOREIGN KEY (EventId)
+        REFERENCES dbo.Events (EventId)
+);
 GO
 
-
-/* ================= STEP 4: DELETE STATEMENT ================= */
-
--- Precaution: check for dependent Artwork records before deleting a Genre,
--- since Genre is a parent table referenced by Artwork (FK_Artwork_Genre).
--- Deleting a genre that still has artworks linked to it would violate the
--- foreign key constraint and must be avoided.
-
-INSERT INTO Genre (Description) VALUES ('Digital Art');   -- new genre, not yet linked to any artwork
-
-SELECT COUNT(*) AS LinkedArtworks
-FROM Artwork
-WHERE GenreID = (SELECT GenreID FROM Genre WHERE Description = 'Digital Art');
--- Result = 0, so it is safe to delete this genre
-
-DELETE FROM Genre
-WHERE Description = 'Digital Art';
-
-SELECT * FROM Genre;   -- confirm the deletion
+/* =========================================================
+   TABLE: Routes
+   Exactly one Route per Category (1..1) - carries the
+   route/elevation info participants use to prepare for race day.
+   ========================================================= */
+CREATE TABLE dbo.Routes (
+    RouteId         INT IDENTITY(1,1)   NOT NULL,
+    CategoryId      INT                 NOT NULL,
+    RouteName       VARCHAR(100)        NOT NULL,
+    MapUrl          VARCHAR(255)        NULL,
+    ElevationGainM  INT                 NULL,
+    Description     VARCHAR(MAX)        NULL,
+    CONSTRAINT PK_Routes PRIMARY KEY (RouteId),
+    CONSTRAINT FK_Routes_Categories FOREIGN KEY (CategoryId)
+        REFERENCES dbo.Categories (CategoryId),
+    CONSTRAINT UQ_Routes_CategoryId UNIQUE (CategoryId)
+);
 GO
 
-
-/* ================= STEP 5: ARTWORK / ARTIST / GENRE REPORT ================= */
-
--- Lists all artwork titles, their artists, and their genres.
--- Sorted alphabetically by genre, then alphabetically by artwork title.
-
-SELECT
-    g.Description                          AS Genre,
-    a.Title                                 AS ArtworkTitle,
-    CONCAT(ar.Name, ' ', ar.Surname)        AS Artist
-FROM Artwork a
-INNER JOIN Genre g  ON a.GenreID  = g.GenreID
-INNER JOIN Artist ar ON a.ArtistID = ar.ArtistID
-ORDER BY g.Description ASC, a.Title ASC;
+/* =========================================================
+   TABLE: Enrolments
+   Junction table resolving the Users(Participant) <-> Categories
+   many-to-many relationship.
+   ========================================================= */
+CREATE TABLE dbo.Enrolments (
+    EnrolmentId     INT IDENTITY(1,1)   NOT NULL,
+    ParticipantId   INT                 NOT NULL,
+    CategoryId      INT                 NOT NULL,
+    EnrolmentDate   DATETIME            NOT NULL DEFAULT GETDATE(),
+    Status          VARCHAR(20)         NOT NULL DEFAULT 'Confirmed',
+    CONSTRAINT PK_Enrolments PRIMARY KEY (EnrolmentId),
+    CONSTRAINT FK_Enrolments_Users FOREIGN KEY (ParticipantId)
+        REFERENCES dbo.Users (UserId),
+    CONSTRAINT FK_Enrolments_Categories FOREIGN KEY (CategoryId)
+        REFERENCES dbo.Categories (CategoryId),
+    CONSTRAINT UQ_Enrolments_Participant_Category UNIQUE (ParticipantId, CategoryId),
+    CONSTRAINT CK_Enrolments_Status CHECK (Status IN ('Confirmed', 'Cancelled'))
+);
 GO
 
-
-/* ================= STEP 6: GROUP BY REPORT ================= */
-
--- Purpose: shows how many artworks fall under each genre, giving the gallery
--- an overview of which genres are most represented in the collection.
-
-SELECT
-    g.Description         AS Genre,
-    COUNT(a.ArtworkID)    AS NumberOfArtworks
-FROM Artwork a
-INNER JOIN Genre g ON a.GenreID = g.GenreID
-GROUP BY g.Description
-ORDER BY g.Description;
+/* =========================================================
+   TABLE: Results
+   Exactly one Result per Enrolment (1..1).
+   ========================================================= */
+CREATE TABLE dbo.Results (
+    ResultId            INT IDENTITY(1,1)  NOT NULL,
+    EnrolmentId         INT                 NOT NULL,
+    FinishTimeSeconds   INT                 NULL,
+    Position            INT                 NULL,
+    RecordedAt          DATETIME            NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT PK_Results PRIMARY KEY (ResultId),
+    CONSTRAINT FK_Results_Enrolments FOREIGN KEY (EnrolmentId)
+        REFERENCES dbo.Enrolments (EnrolmentId),
+    CONSTRAINT UQ_Results_EnrolmentId UNIQUE (EnrolmentId)
+);
 GO
 
+/* =========================================================
+   SEED DATA
+   2 Organisers, 2 Participants, 3 Events, categories per
+   event, routes per category, sample enrolments and results.
+   ========================================================= */
 
-/* ================= STEP 7: HAVING CLAUSE REPORT ================= */
-
--- Purpose: identifies the gallery's most prolific artists - those who have
--- created more than 3 artworks - to help decide who to feature in a
--- dedicated retrospective exhibition.
-
-SELECT
-    ar.Name,
-    ar.Surname,
-    COUNT(a.ArtworkID) AS NumberOfArtworks
-FROM Artwork a
-INNER JOIN Artist ar ON a.ArtistID = ar.ArtistID
-GROUP BY ar.ArtistID, ar.Name, ar.Surname
-HAVING COUNT(a.ArtworkID) > 3
-ORDER BY NumberOfArtworks DESC;
+-- Users: 2 Organisers, 2 Participants
+INSERT INTO dbo.Users (FullName, Email, PasswordHash, Role) VALUES
+('Thabo Nkosi',     'thabo.nkosi@raceday.co.za',     'HASHED_PW_1', 'Organiser'),
+('Lindiwe Zulu',     'lindiwe.zulu@raceday.co.za',     'HASHED_PW_2', 'Organiser'),
+('Sipho Dlamini',    'sipho.dlamini@example.com',      'HASHED_PW_3', 'Participant'),
+('Aisha Patel',      'aisha.patel@example.com',        'HASHED_PW_4', 'Participant');
 GO
 
+-- Events: 3 events, split across the 2 organisers
+INSERT INTO dbo.Events (OrganiserId, Name, Description, EventDate, Location) VALUES
+(1, 'Durban Beachfront Fun Run', 'A scenic morning run along the Durban promenade.', '2026-10-18', 'Durban, KwaZulu-Natal'),
+(1, 'Comrades Community Cycle Tour', 'A charity cycling event supporting local road running clubs.', '2026-11-08', 'Pietermaritzburg, KwaZulu-Natal'),
+(2, 'Cape Peninsula Trail Walk', 'A guided walking event along the Cape Peninsula coastline.', '2026-09-27', 'Cape Town, Western Cape');
+GO
 
-/* ================= STEP 8: JOIN REPORT ================= */
+-- Categories: at least one per event
+INSERT INTO dbo.Categories (EventId, Name, DistanceKm, Price, MaxParticipants) VALUES
+(1, '5km Fun Run', 5.00, 100.00, 200),
+(1, '10km Race', 10.00, 150.00, 150),
+(2, '40km Cycle Tour', 40.00, 250.00, 100),
+(3, '8km Guided Walk', 8.00, 80.00, 80);
+GO
 
--- Purpose: produces an exhibition catalogue showing every artwork alongside
--- each exhibition it has been entered into, useful for tracking an
--- artwork's exhibition history.
+-- Routes: one per category (1..1)
+INSERT INTO dbo.Routes (CategoryId, RouteName, MapUrl, ElevationGainM, Description) VALUES
+(1, 'Beachfront Loop', 'https://maps.example.com/beachfront-5km', 20, 'Flat, out-and-back route along the promenade.'),
+(2, 'Beachfront Extended', 'https://maps.example.com/beachfront-10km', 45, 'Extended promenade route with one hill section.'),
+(3, 'Comrades Access Road', 'https://maps.example.com/comrades-cycle-40km', 320, 'Rolling hills typical of the Comrades route.'),
+(4, 'Cape Point Coastal Path', 'https://maps.example.com/cape-point-8km', 150, 'Coastal path with moderate elevation gain.');
+GO
 
-SELECT
-    a.Title             AS ArtworkTitle,
-    e.Description        AS ExhibitionEntered
-FROM Artwork a
-INNER JOIN Entry en      ON a.ArtworkID = en.ArtworkID
-INNER JOIN Exhibition e  ON en.ExhibitionID = e.ExhibitionID
-ORDER BY a.Title;
+-- Enrolments: sample enrolments for both participants
+INSERT INTO dbo.Enrolments (ParticipantId, CategoryId, Status) VALUES
+(3, 1, 'Confirmed'),
+(3, 3, 'Confirmed'),
+(4, 2, 'Confirmed'),
+(4, 4, 'Confirmed');
+GO
+
+-- Results: sample results for two enrolments
+INSERT INTO dbo.Results (EnrolmentId, FinishTimeSeconds, Position) VALUES
+(1, 1620, 12),
+(3, 3120, 5);
 GO
