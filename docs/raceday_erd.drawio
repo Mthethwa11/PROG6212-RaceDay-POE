@@ -1,0 +1,76 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="RaceDay ERD" id="raceday-erd">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1650" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- USERS -->
+        <mxCell id="users" value="&lt;b&gt;Users&lt;/b&gt;&lt;br&gt;PK UserId (INT, IDENTITY)&lt;br&gt;FullName (VARCHAR(100), NOT NULL)&lt;br&gt;Email (VARCHAR(150), NOT NULL, UNIQUE)&lt;br&gt;PasswordHash (VARCHAR(255), NOT NULL)&lt;br&gt;Role (VARCHAR(20), NOT NULL)&lt;br&gt;CreatedAt (DATETIME, DEFAULT GETDATE())" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="240" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- EVENTS -->
+        <mxCell id="events" value="&lt;b&gt;Events&lt;/b&gt;&lt;br&gt;PK EventId (INT, IDENTITY)&lt;br&gt;FK OrganiserId -&gt; Users.UserId (INT, NOT NULL)&lt;br&gt;Name (VARCHAR(150), NOT NULL)&lt;br&gt;Description (VARCHAR(MAX))&lt;br&gt;EventDate (DATE, NOT NULL)&lt;br&gt;Location (VARCHAR(150), NOT NULL)&lt;br&gt;CreatedAt (DATETIME, DEFAULT GETDATE())" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="360" y="40" width="260" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- CATEGORIES -->
+        <mxCell id="categories" value="&lt;b&gt;Categories&lt;/b&gt;&lt;br&gt;PK CategoryId (INT, IDENTITY)&lt;br&gt;FK EventId -&gt; Events.EventId (INT, NOT NULL)&lt;br&gt;Name (VARCHAR(100), NOT NULL)&lt;br&gt;DistanceKm (DECIMAL(5,2), NOT NULL)&lt;br&gt;Price (DECIMAL(8,2), NOT NULL, DEFAULT 0)&lt;br&gt;MaxParticipants (INT, NOT NULL)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="700" y="40" width="260" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- ROUTES -->
+        <mxCell id="routes" value="&lt;b&gt;Routes&lt;/b&gt;&lt;br&gt;PK RouteId (INT, IDENTITY)&lt;br&gt;FK CategoryId -&gt; Categories.CategoryId (INT, NOT NULL, UNIQUE)&lt;br&gt;RouteName (VARCHAR(100), NOT NULL)&lt;br&gt;MapUrl (VARCHAR(255))&lt;br&gt;ElevationGainM (INT)&lt;br&gt;Description (VARCHAR(MAX))" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="40" width="260" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- ENROLMENTS -->
+        <mxCell id="enrolments" value="&lt;b&gt;Enrolments&lt;/b&gt;&lt;br&gt;PK EnrolmentId (INT, IDENTITY)&lt;br&gt;FK ParticipantId -&gt; Users.UserId (INT, NOT NULL)&lt;br&gt;FK CategoryId -&gt; Categories.CategoryId (INT, NOT NULL)&lt;br&gt;EnrolmentDate (DATETIME, DEFAULT GETDATE())&lt;br&gt;Status (VARCHAR(20), NOT NULL, DEFAULT 'Confirmed')" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="360" y="300" width="260" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- RESULTS -->
+        <mxCell id="results" value="&lt;b&gt;Results&lt;/b&gt;&lt;br&gt;PK ResultId (INT, IDENTITY)&lt;br&gt;FK EnrolmentId -&gt; Enrolments.EnrolmentId (INT, NOT NULL, UNIQUE)&lt;br&gt;FinishTimeSeconds (INT)&lt;br&gt;Position (INT)&lt;br&gt;RecordedAt (DATETIME, DEFAULT GETDATE())" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="700" y="300" width="260" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- Users -> Events (1..M organises) -->
+        <mxCell id="e1" value="1 . . M (organises)" style="endArrow=none;html=1;startArrow=diamondThin;startFill=0;fontSize=11;" edge="1" parent="1" source="users" target="events">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Events -> Categories (1..M has) -->
+        <mxCell id="e2" value="1 . . M (has)" style="endArrow=none;html=1;startArrow=diamondThin;startFill=0;fontSize=11;" edge="1" parent="1" source="events" target="categories">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Categories -> Routes (1..1 has) -->
+        <mxCell id="e3" value="1 . . 1 (has)" style="endArrow=none;html=1;startArrow=diamondThin;startFill=0;fontSize=11;" edge="1" parent="1" source="categories" target="routes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Users -> Enrolments (1..M enrols) -->
+        <mxCell id="e4" value="1 . . M (enrols)" style="endArrow=none;html=1;startArrow=diamondThin;startFill=0;fontSize=11;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="users" target="enrolments">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Categories -> Enrolments (1..M offered_via) -->
+        <mxCell id="e5" value="1 . . M (offered via)" style="endArrow=none;html=1;startArrow=diamondThin;startFill=0;fontSize=11;" edge="1" parent="1" source="categories" target="enrolments">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Enrolments -> Results (1..1 produces) -->
+        <mxCell id="e6" value="1 . . 1 (produces)" style="endArrow=none;html=1;startArrow=diamondThin;startFill=0;fontSize=11;" edge="1" parent="1" source="enrolments" target="results">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Note: Users(Participant) <-> Categories is many-to-many, resolved by Enrolments -->
+        <mxCell id="note" value="Users (Participant role) &lt;-&gt; Categories is many-to-many, resolved via the Enrolments junction table above." style="text;html=1;align=left;verticalAlign=top;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="300" width="260" height="60" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
