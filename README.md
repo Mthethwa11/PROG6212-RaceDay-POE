@@ -41,7 +41,7 @@ README.md                 - This file
 
 ## CI/CD
 
-<!-- TODO: insert screenshot of the green GitHub Actions build here once the workflow is set up -->
+   ![CI/CD Build Passing](docs/ci_cd_success.png)
 
 ## Video Walkthrough
 
