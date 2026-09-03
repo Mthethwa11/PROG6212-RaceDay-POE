@@ -155,7 +155,8 @@ GO
 INSERT INTO dbo.Events (OrganiserId, Name, Description, EventDate, Location) VALUES
 (1, 'Durban Beachfront Fun Run', 'A scenic morning run along the Durban promenade.', '2026-10-18', 'Durban, KwaZulu-Natal'),
 (1, 'Comrades Community Cycle Tour', 'A charity cycling event supporting local road running clubs.', '2026-11-08', 'Pietermaritzburg, KwaZulu-Natal'),
-(2, 'Cape Peninsula Trail Walk', 'A guided walking event along the Cape Peninsula coastline.', '2026-09-27', 'Cape Town, Western Cape');
+(2, 'Cape Peninsula Trail Walk', 'A guided walking event along the Cape Peninsula coastline.', '2026-09-27', 'Cape Town, Western Cape'),
+(2, 'Johannesburg City Park Run', 'A weekly community park run in the heart of Johannesburg.', '2026-09-20', 'Johannesburg, Gauteng');
 GO
 
 -- Categories: at least one per event
@@ -163,7 +164,8 @@ INSERT INTO dbo.Categories (EventId, Name, DistanceKm, Price, MaxParticipants) V
 (1, '5km Fun Run', 5.00, 100.00, 200),
 (1, '10km Race', 10.00, 150.00, 150),
 (2, '40km Cycle Tour', 40.00, 250.00, 100),
-(3, '8km Guided Walk', 8.00, 80.00, 80);
+(3, '8km Guided Walk', 8.00, 80.00, 80),
+(4, '5km Park Run', 5.00, 0.00, 300);
 GO
 
 -- Routes: one per category (1..1)
