@@ -183,3 +183,14 @@ INSERT INTO dbo.Results (EnrolmentId, FinishTimeSeconds, Position) VALUES
 (1, 1620, 12),
 (3, 3120, 5);
 GO
+
+/* =========================================================
+   INDEXES
+   Speed up lookups on foreign key columns that will be
+   queried frequently by the API (Part 2).
+   ========================================================= */
+CREATE INDEX IX_Events_OrganiserId ON dbo.Events (OrganiserId);
+CREATE INDEX IX_Categories_EventId ON dbo.Categories (EventId);
+CREATE INDEX IX_Enrolments_ParticipantId ON dbo.Enrolments (ParticipantId);
+CREATE INDEX IX_Enrolments_CategoryId ON dbo.Enrolments (CategoryId);
+GO
