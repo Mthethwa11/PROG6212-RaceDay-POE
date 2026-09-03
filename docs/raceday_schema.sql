@@ -28,6 +28,10 @@ GO
    TABLE: Users
    Holds both roles ('Organiser' and 'Participant').
    ========================================================= */
+   /* Design note: Users is a single table for both roles (Organiser and
+      Participant), distinguished by the Role column and enforced with a
+      CHECK constraint. This avoids duplicating shared fields (name, email,
+      password) across two separate tables. */
 CREATE TABLE dbo.Users (
     UserId          INT IDENTITY(1,1)   NOT NULL,
     FullName        VARCHAR(100)        NOT NULL,
