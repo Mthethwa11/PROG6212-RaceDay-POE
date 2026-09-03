@@ -54,4 +54,10 @@ jobs:
           echo "OK: README.md found."
 
       - name: Structure validation passed
-        run: echo "All required Part 1 files are present."
+        run: 
+           echo "================================================"
+           echo "  RaceDay Part 1 structure validation: PASSED"
+           echo "  All required files (ERD, API plan, SQL script,"
+           echo "  README) are present in the repository."
+           echo "================================================"
+        
