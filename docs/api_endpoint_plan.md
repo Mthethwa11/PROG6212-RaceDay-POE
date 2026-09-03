@@ -49,3 +49,14 @@
 | POST | /api/enrolments/{id}/result | Captures a participant's finish result for an enrolment. | Organiser (event owner) | `{ finishTimeSeconds, position }` | 201 Created — result record · 403 Forbidden · 404 Not Found |
 | GET | /api/enrolments/{id}/result | Gets the result for a specific enrolment. | Any (logged in — owner or organiser) | None | 200 OK — result object · 404 Not Found |
 | GET | /api/users/me/results | Gets the logged-in participant's personal performance history. | Participant | None | 200 OK — array of results |
+
+
+
+
+
+## Design Notes
+
+- **Enrolment cancellation uses DELETE, not PATCH.** A cancelled enrolment is treated as a full removal rather than a status change, since the brief does not require retaining cancellation history for reporting.
+- **Category and Event deletion are Organiser-only and owner-restricted.** Any Organiser can view public event/category data via GET, but only the Organiser who created the resource can modify or delete it — enforced at the API level as stated in the brief.
+- **Results are captured by the Organiser, not the Participant**, since results reflect official race outcomes that need to be verified by the event's organiser rather than self-reported.
+- **Registration and login are the only public (unauthenticated) write endpoints.** Every other POST/PUT/DELETE endpoint requires a valid logged-in user, with role-based restrictions layered on top where relevant.
