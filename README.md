@@ -53,7 +53,7 @@ README.md                  - This file
 
 ## Video Walkthrough
 
-<!-- TODO: insert unlisted YouTube link here once the video is recorded -->
+https://youtu.be/RfA3ZOpw8js
 
 ## AI Tool Disclosure
 
