@@ -15,6 +15,13 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
@@ -43,6 +50,31 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
+
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true)
+    {
+        if (context.Session.GetString("UserId") == null)
+        {
+            var userManager = context.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+            var user = await userManager.GetUserAsync(context.User);
+            if (user != null)
+            {
+                var roles = await userManager.GetRolesAsync(user);
+                context.Session.SetString("UserId", user.Id);
+                context.Session.SetString("Role", roles.FirstOrDefault() ?? string.Empty);
+            }
+        }
+    }
+    else if (context.Session.GetString("UserId") != null)
+    {
+        context.Session.Clear();
+    }
+
+    await next();
+});
 
 app.UseAuthorization();
 
