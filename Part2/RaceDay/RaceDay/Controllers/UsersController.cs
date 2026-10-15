@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using RaceDay.Dtos;
 using RaceDay.Models;
 
 namespace RaceDay.Controllers
@@ -14,10 +15,12 @@ namespace RaceDay.Controllers
     public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public UsersController(UserManager<ApplicationUser> userManager)
+        public UsersController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         /// <summary>
@@ -40,15 +43,58 @@ namespace RaceDay.Controllers
                 return Unauthorized();
             }
 
-            return Ok(new UserProfileDto
-            {
-                UserId = HttpContext.Session.GetString("UserId") ?? user.Id,
-                FullName = user.FullName,
-                Email = user.Email ?? string.Empty,
-                Role = HttpContext.Session.GetString("Role") ?? string.Empty,
-                CreatedAt = user.CreatedAt
-            });
+            return Ok(ToDto(user));
         }
+
+        /// <summary>
+        /// Updates the logged-in user's name and email.
+        /// </summary>
+        /// <remarks>Body: fullName and email. The role cannot be changed here.</remarks>
+        /// <response code="200">The updated profile.</response>
+        /// <response code="400">The request body is invalid.</response>
+        /// <response code="401">The caller is not logged in.</response>
+        /// <response code="409">Another account already uses this email.</response>
+        [HttpPut("me")]
+        [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> UpdateMe([FromBody] UpdateProfileRequest request)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            user.FullName = request.FullName;
+            user.Email = request.Email;
+            user.UserName = request.Email;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                if (result.Errors.Any(e => e.Code is "DuplicateUserName" or "DuplicateEmail"))
+                {
+                    return Conflict(new { message = "Another account already uses this email." });
+                }
+
+                return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+
+            return Ok(ToDto(user));
+        }
+
+        private UserProfileDto ToDto(ApplicationUser user) => new()
+        {
+            UserId = HttpContext.Session.GetString("UserId") ?? user.Id,
+            FullName = user.FullName,
+            Email = user.Email ?? string.Empty,
+            Role = HttpContext.Session.GetString("Role") ?? string.Empty,
+            CreatedAt = user.CreatedAt
+        };
     }
 
     /// <summary>
