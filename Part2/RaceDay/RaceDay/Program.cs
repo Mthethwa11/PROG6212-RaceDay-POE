@@ -51,7 +51,11 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Event management API for South African running, walking and cycling events."
     });
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
 });
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -124,3 +128,4 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+public partial class Program { }
