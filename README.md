@@ -170,8 +170,7 @@ The Part 1 ERD, SQL script and endpoint plan were followed, with these deliberat
 ## Video Walkthroughs
 
 - **Part 1:** [Watch the Part 1 walkthrough video](https://youtu.be/RfA3ZOpw8js)
-- **Part 2:** _link to be added_
-
+- **Part 2:** [Watch the Part 2 walkthrough video](https://youtu.be/GHIwjM5FKQ8)
 ## AI Tool Disclosure
 
-AI tools (Claude) were used to help plan the ERD and API design in Part 1, and in Part 2 to help generate and explain code (models, controllers, tests, and the CI workflow) and to troubleshoot errors. All code was reviewed, run, and tested by me, and I can explain the design decisions and code structure in the accompanying video walkthroughs.
+AI tools (DeepSeek) were used to help plan and assist in debugging and to troubleshoot errors reviewing code. All code was done, run, and tested by me, and I can explain the design decisions and code structure in the accompanying video walkthroughs.
