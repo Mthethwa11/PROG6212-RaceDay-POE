@@ -1,3 +1,17 @@
-﻿@{
-    Layout = "_Layout";
+@{
+    // Each role gets its own layout, so the interface and navigation are clearly different.
+    var session = Context.Session;
+
+    if (!session.IsAuthenticated())
+    {
+        Layout = "_Layout";               // guests: Log in / Join
+    }
+    else if (session.IsOrganiser())
+    {
+        Layout = "_OrganiserLayout";      // organisers: sidebar management console
+    }
+    else
+    {
+        Layout = "_ParticipantLayout";    // participants: top navigation bar
+    }
 }
