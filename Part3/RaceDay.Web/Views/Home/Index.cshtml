@@ -1,8 +1,21 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Home";
+    var isLoggedIn = Context.Session.IsAuthenticated();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (!isLoggedIn)
+{
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Find your next <span>finish line</span></h1>
+            <p class="hero-text">Browse runs, walks and rides, enter in a few taps, and keep every result in one place.</p>
+            <a class="btn btn-primary btn-lg me-2" asp-controller="Account" asp-action="Register">Join RaceDay</a>
+            <a class="btn btn-outline-light btn-lg" asp-controller="Account" asp-action="Login">Log in</a>
+        </div>
+    </section>
+}
+else
+{
+    <h1 class="mb-1">Welcome, @Context.Session.GetFullName()</h1>
+    <p class="text-muted">Upcoming events will appear here.</p>
+}
