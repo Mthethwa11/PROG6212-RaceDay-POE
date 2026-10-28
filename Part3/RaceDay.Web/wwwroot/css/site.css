@@ -1,22 +1,191 @@
-html {
-  font-size: 14px;
+/* RaceDay theme: energetic sporting look. Navy + orange + lime accent. */
+:root {
+    --rd-navy: #0B1F3A;
+    --rd-navy-2: #13294B;
+    --rd-orange: #FF5A1F;
+    --rd-orange-dark: #E04A12;
+    --rd-lime: #C6F432;
+    --rd-bg: #F4F6FA;
+    --rd-text: #1B2638;
+    --rd-muted: #6B778C;
+    --font-heading: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
+html { font-size: 15px; position: relative; min-height: 100%; }
+@media (min-width: 768px) { html { font-size: 16px; } }
 
 body {
-  margin-bottom: 60px;
+    font-family: var(--font-body);
+    background: var(--rd-bg);
+    color: var(--rd-text);
+    margin: 0;
+}
+body.layout-guest, body.layout-participant {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+main.page { flex: 1; }
+
+h1, h2, h3, h4, h5, .brand-mark {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    font-weight: 700;
+}
+
+a { color: var(--rd-orange-dark); }
+a:hover { color: var(--rd-orange); }
+
+/* Buttons: make Bootstrap's primary the RaceDay orange */
+.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--rd-orange);
+    --bs-btn-border-color: var(--rd-orange);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--rd-orange-dark);
+    --bs-btn-hover-border-color: var(--rd-orange-dark);
+    --bs-btn-active-bg: var(--rd-orange-dark);
+    --bs-btn-active-border-color: var(--rd-orange-dark);
+    --bs-btn-focus-shadow-rgb: 255, 90, 31;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--rd-orange);
+    box-shadow: 0 0 0 .25rem rgba(255, 90, 31, .2);
+}
+
+/* Validation */
+.validation-summary-valid { display: none; }
+.validation-summary-errors ul { margin: 0; padding-left: 1.1rem; }
+
+/* Navbar (guests and participants) */
+.navbar-raceday {
+    background: var(--rd-navy);
+    border-bottom: 4px solid var(--rd-orange);
+}
+.navbar-raceday .nav-link { color: rgba(255, 255, 255, .85); font-weight: 500; }
+.navbar-raceday .nav-link:hover, .navbar-raceday .nav-link.active { color: #fff; }
+
+.brand-mark {
+    color: #fff !important;
+    font-size: 1.7rem;
+    font-style: italic;
+    text-decoration: none;
+}
+.brand-mark span { color: var(--rd-orange); }
+
+.role-badge {
+    display: inline-block;
+    background: var(--rd-lime);
+    color: var(--rd-navy);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: .15rem .55rem;
+    border-radius: 999px;
+}
+
+/* Cards */
+.card { border: 0; border-radius: .9rem; box-shadow: 0 4px 18px rgba(11, 31, 58, .08); }
+.auth-card { border-top: 5px solid var(--rd-orange); }
+.auth-title { font-size: 2.2rem; color: var(--rd-navy); margin-bottom: .25rem; }
+
+/* Hero */
+.hero {
+    background: linear-gradient(135deg, var(--rd-navy) 0%, var(--rd-navy-2) 60%, #1d3d6e 100%);
+    color: #fff;
+    border-radius: 1rem;
+    padding: 4.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+}
+.hero::after {
+    content: "";
+    position: absolute;
+    right: -70px;
+    top: -40px;
+    width: 280px;
+    height: 140%;
+    background: var(--rd-orange);
+    transform: skewX(-18deg);
+    opacity: .9;
+}
+.hero-content { position: relative; z-index: 1; max-width: 640px; }
+.hero-title { font-size: clamp(2.4rem, 6vw, 4rem); line-height: 1; margin-bottom: 1rem; }
+.hero-title span { color: var(--rd-lime); }
+.hero-text { font-size: 1.15rem; color: rgba(255, 255, 255, .85); margin-bottom: 1.75rem; }
+
+/* Enrolment status badges (colour-coded) */
+.status-badge {
+    display: inline-block;
+    padding: .25rem .7rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+.status-confirmed { background: #DDF7E3; color: #157A3A; }
+.status-cancelled { background: #FDE0DF; color: #B42318; }
+.status-pending   { background: #FFF1D6; color: #9A6200; }
+.status-completed { background: #DCE8FF; color: #1D4FA8; }
+
+/* Footer */
+.site-footer {
+    background: var(--rd-navy);
+    color: rgba(255, 255, 255, .7);
+    padding: 1.1rem 0;
+    font-size: .9rem;
+}
+
+/* Organiser layout: sidebar console */
+.org-shell { display: flex; min-height: 100vh; }
+.org-sidebar {
+    width: 250px;
+    flex-shrink: 0;
+    background: var(--rd-navy);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 1.4rem 1rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    border-right: 4px solid var(--rd-orange);
+}
+.org-brand { display: block; margin-bottom: .6rem; }
+.org-link {
+    display: block;
+    padding: .65rem .9rem;
+    border-radius: .5rem;
+    color: rgba(255, 255, 255, .8);
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: .25rem;
+}
+.org-link:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+.org-link.active { background: var(--rd-orange); color: #fff; }
+.org-user-name { color: rgba(255, 255, 255, .85); font-weight: 500; margin-bottom: .6rem; word-break: break-word; }
+
+.org-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.org-topbar { background: #fff; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(11, 31, 58, .06); }
+.org-title { margin: 0; font-size: 1.8rem; color: var(--rd-navy); }
+.org-content { padding: 2rem; }
+
+@media (max-width: 767.98px) {
+    .org-shell { flex-direction: column; }
+    .org-sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        border-right: 0;
+        border-bottom: 4px solid var(--rd-orange);
+    }
+    .org-user { margin-top: 1rem; }
+    .org-content, .org-topbar { padding: 1rem; }
 }
