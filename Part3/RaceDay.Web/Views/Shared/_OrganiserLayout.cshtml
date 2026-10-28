@@ -1,0 +1,52 @@
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - RaceDay Organiser</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="layout-organiser">
+    <div class="org-shell">
+        <aside class="org-sidebar">
+            <a class="brand-mark org-brand" asp-controller="Organiser" asp-action="Dashboard">RACE<span>DAY</span></a>
+            <div class="role-badge mb-4">Organiser</div>
+
+            <nav class="org-nav">
+                <a class="org-link @(controller == "Organiser" && action == "Dashboard" ? "active" : "")"
+                   asp-controller="Organiser" asp-action="Dashboard">Dashboard</a>
+            </nav>
+
+            <div class="org-user mt-auto">
+                <div class="org-user-name">@Context.Session.GetFullName()</div>
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="btn btn-outline-light btn-sm w-100">Log out</button>
+                </form>
+            </div>
+        </aside>
+
+        <div class="org-main">
+            <div class="org-topbar">
+                <h1 class="org-title">@ViewData["Title"]</h1>
+            </div>
+            <main class="org-content">
+                <partial name="_Alerts" />
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
