@@ -189,3 +189,101 @@ a:hover { color: var(--rd-orange); }
     .org-user { margin-top: 1rem; }
     .org-content, .org-topbar { padding: 1rem; }
 }
+
+/* ------------------------------------------------------------------
+   Events, dashboard and tables
+------------------------------------------------------------------- */
+.stat-card { border-left: 5px solid var(--rd-orange); }
+.stat-value {
+    font-family: var(--font-heading);
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--rd-navy);
+}
+.stat-label {
+    color: var(--rd-muted);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-size: .8rem;
+    font-weight: 600;
+    margin-top: .35rem;
+}
+
+.table-raceday thead th {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    font-size: .95rem;
+    color: var(--rd-muted);
+    border-bottom: 2px solid var(--rd-orange);
+    white-space: nowrap;
+}
+
+.event-thumb {
+    width: 96px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: .5rem;
+    display: block;
+}
+.event-thumb-placeholder {
+    width: 96px;
+    height: 56px;
+    border-radius: .5rem;
+    background: linear-gradient(135deg, var(--rd-navy), var(--rd-orange));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: .08em;
+    font-size: .95rem;
+}
+.banner-preview {
+    max-width: 100%;
+    max-height: 180px;
+    object-fit: cover;
+    border-radius: .6rem;
+}
+
+.type-badge {
+    display: inline-block;
+    padding: .1rem .55rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+.type-run   { background: #FFE6DB; color: #B33A0E; }
+.type-walk  { background: #E8F9C4; color: #4B6B00; }
+.type-cycle { background: #DCE8FF; color: #1D4FA8; }
+
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--rd-muted); }
+
+/* Make primary buttons RaceDay orange on every Bootstrap version */
+.btn-primary {
+    color: #fff;
+    background-color: var(--rd-orange);
+    border-color: var(--rd-orange);
+}
+
+    .btn-primary:hover,
+    .btn-primary:focus,
+    .btn-primary:active {
+        color: #fff;
+        background-color: var(--rd-orange-dark);
+        border-color: var(--rd-orange-dark);
+    }
+
+    .btn-primary:focus {
+        box-shadow: 0 0 0 .25rem rgba(255, 90, 31, .35);
+    }
+
+    .btn-primary:disabled {
+        background-color: var(--rd-orange);
+        border-color: var(--rd-orange);
+        opacity: .65;
+    }
