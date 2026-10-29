@@ -49,7 +49,50 @@ namespace RaceDay.Controllers
                     DistanceKm = e.DistanceKm,
                     EventType = e.EventType,
                     OrganiserId = e.OrganiserId,
-                    OrganiserName = e.Organiser!.FullName
+                    OrganiserName = e.Organiser!.FullName,
+                    BannerUrl = e.BannerUrl
+                })
+                .ToListAsync();
+
+            return Ok(events);
+        }
+
+        /// <summary>
+        /// Lists every event created by the logged-in Organiser, including past events,
+        /// with the number of confirmed enrolments for each. Newest first.
+        /// </summary>
+        /// <remarks>Organiser only. No request body.</remarks>
+        /// <response code="200">An array of the Organiser's events (may be empty).</response>
+        /// <response code="401">The caller is not logged in.</response>
+        /// <response code="403">The caller is logged in but is not an Organiser.</response>
+        [HttpGet("mine")]
+        [Authorize(Roles = "Organiser")]
+        [ProducesResponseType(typeof(List<EventResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<List<EventResponse>>> GetMine()
+        {
+            var userId = _userManager.GetUserId(User)!;
+
+            var events = await _db.Events
+                .AsNoTracking()
+                .Where(e => e.OrganiserId == userId)
+                .OrderByDescending(e => e.EventDate)
+                .Select(e => new EventResponse
+                {
+                    EventId = e.EventId,
+                    Name = e.Name,
+                    Description = e.Description,
+                    EventDate = e.EventDate,
+                    Location = e.Location,
+                    DistanceKm = e.DistanceKm,
+                    EventType = e.EventType,
+                    OrganiserId = e.OrganiserId,
+                    OrganiserName = e.Organiser!.FullName,
+                    BannerUrl = e.BannerUrl,
+                    EnrolmentCount = e.Categories
+                        .SelectMany(c => c.Enrolments)
+                        .Count(en => en.Status == "Confirmed")
                 })
                 .ToListAsync();
 
@@ -83,6 +126,10 @@ namespace RaceDay.Controllers
                     EventType = e.EventType,
                     OrganiserId = e.OrganiserId,
                     OrganiserName = e.Organiser!.FullName,
+                    BannerUrl = e.BannerUrl,
+                    EnrolmentCount = e.Categories
+                        .SelectMany(c => c.Enrolments)
+                        .Count(en => en.Status == "Confirmed"),
                     Categories = e.Categories.Select(c => new CategorySummary
                     {
                         CategoryId = c.CategoryId,
@@ -239,7 +286,8 @@ namespace RaceDay.Controllers
             DistanceKm = ev.DistanceKm,
             EventType = ev.EventType,
             OrganiserId = ev.OrganiserId,
-            OrganiserName = organiserName
+            OrganiserName = organiserName,
+            BannerUrl = ev.BannerUrl
         };
     }
 }

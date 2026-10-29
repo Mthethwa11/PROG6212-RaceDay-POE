@@ -41,6 +41,13 @@ namespace RaceDay.Dtos
         public string EventType { get; set; } = string.Empty;
         public string OrganiserId { get; set; } = string.Empty;
         public string OrganiserName { get; set; } = string.Empty;
+
+        /// <summary>Public URL of the banner image, or null if none has been uploaded.</summary>
+        public string? BannerUrl { get; set; }
+
+        /// <summary>Number of Confirmed enrolments across all categories of this event.</summary>
+        public int EnrolmentCount { get; set; }
+
         public List<CategorySummary> Categories { get; set; } = new();
     }
 
