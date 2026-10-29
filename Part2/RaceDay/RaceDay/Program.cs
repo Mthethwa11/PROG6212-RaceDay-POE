@@ -4,6 +4,7 @@ using RaceDay.Data;
 using RaceDay.Models;
 using System.Reflection;
 using Microsoft.OpenApi.Models;
+using RaceDay.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +66,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddSingleton<IBlobStorageService, BlobStorageService>();
 var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
