@@ -23,6 +23,10 @@
             <nav class="org-nav">
                 <a class="org-link @(controller == "Organiser" && action == "Dashboard" ? "active" : "")"
                    asp-controller="Organiser" asp-action="Dashboard">Dashboard</a>
+                <a class="org-link @(controller == "OrganiserEvents" && action != "Create" ? "active" : "")"
+                   asp-controller="OrganiserEvents" asp-action="Index">My events</a>
+                <a class="org-link @(controller == "OrganiserEvents" && action == "Create" ? "active" : "")"
+                   asp-controller="OrganiserEvents" asp-action="Create">Create event</a>
             </nav>
 
             <div class="org-user mt-auto">
