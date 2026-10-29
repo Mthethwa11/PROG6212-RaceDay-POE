@@ -1,3 +1,5 @@
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 using RaceDay.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,6 +42,16 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// Always use one culture (en-US) so decimals like 5.5 and dates bind and display the same
+// on every PC, whatever its regional settings (some use a comma as the decimal separator).
+var supportedCultures = new[] { new CultureInfo("en-US") };
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("en-US"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+});
 
 app.UseRouting();
 
