@@ -1,0 +1,85 @@
+@model List<EventDto>
+@{
+    ViewData["Title"] = "My events";
+}
+
+@if (ViewData["LoadError"] is string loadError)
+{
+    <div class="alert alert-warning">@loadError</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <p class="text-muted mb-0">@Model.Count @(Model.Count == 1 ? "event" : "events") created</p>
+    <a class="btn btn-primary" asp-action="Create">Create event</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="card">
+        <div class="card-body empty-state">
+            <h2 class="h4">No events yet</h2>
+            <p>Create your first event to start taking enrolments.</p>
+            <a class="btn btn-primary" asp-action="Create">Create event</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-raceday align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Location</th>
+                        <th>Distance</th>
+                        <th class="text-end">Enrolments</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(e.BannerUrl))
+                                {
+                                    <img class="event-thumb" src="@e.BannerUrl" alt="Banner for @e.Name" />
+                                }
+                                else
+                                {
+                                    <div class="event-thumb-placeholder">@e.EventType.ToUpperInvariant()</div>
+                                }
+                            </td>
+                            <td>
+                                <div class="fw-semibold">@e.Name</div>
+                                <span class="type-badge type-@e.EventType.ToLowerInvariant()">@e.EventType</span>
+                            </td>
+                            <td>@e.EventDate.ToString("ddd, d MMM yyyy")</td>
+                            <td>@e.Location</td>
+                            <td>@e.DistanceKm.ToString("0.##") km</td>
+                            <td class="text-end fw-semibold">@e.EnrolmentCount</td>
+                            <td>
+                                @if (e.IsUpcoming)
+                                {
+                                    <span class="status-badge status-confirmed">Upcoming</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-completed">Past</span>
+                                }
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-outline-secondary btn-sm" asp-action="Edit" asp-route-id="@e.EventId">Edit</a>
+                                <a class="btn btn-outline-danger btn-sm" asp-action="Delete" asp-route-id="@e.EventId">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
