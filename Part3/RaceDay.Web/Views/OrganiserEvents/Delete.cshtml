@@ -1,0 +1,30 @@
+@model EventDto
+@{
+    ViewData["Title"] = "Delete event";
+}
+
+<div class="card auth-card">
+    <div class="card-body p-4">
+        <h2 class="h4">Delete this event?</h2>
+        <p class="text-muted">This can't be undone.</p>
+
+        <dl class="row mb-4">
+            <dt class="col-sm-3">Event</dt>
+            <dd class="col-sm-9">@Model.Name <span class="type-badge type-@Model.EventType.ToLowerInvariant()">@Model.EventType</span></dd>
+            <dt class="col-sm-3">Date</dt>
+            <dd class="col-sm-9">@Model.EventDate.ToString("ddd, d MMM yyyy")</dd>
+            <dt class="col-sm-3">Location</dt>
+            <dd class="col-sm-9">@Model.Location</dd>
+        </dl>
+
+        <div class="alert alert-warning">
+            An event that still has categories can't be deleted. If you see an error afterwards,
+            delete its categories first.
+        </div>
+
+        <form asp-action="DeleteConfirmed" asp-route-id="@Model.EventId" method="post" class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">Yes, delete event</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+        </form>
+    </div>
+</div>
