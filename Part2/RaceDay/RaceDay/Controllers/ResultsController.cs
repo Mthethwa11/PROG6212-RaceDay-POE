@@ -39,7 +39,8 @@ namespace RaceDay.Controllers
             CategoryName = r.Enrolment.Category.Name,
             FinishTimeSeconds = r.FinishTimeSeconds,
             Position = r.Position,
-            RecordedAt = r.RecordedAt
+            RecordedAt = r.RecordedAt,
+            TotalFinishers = r.Enrolment.Category.Enrolments.Count(x => x.Result != null)
         };
 
         /// <summary>
@@ -115,6 +116,62 @@ namespace RaceDay.Controllers
         }
 
         /// <summary>
+        /// Corrects the finish time and position of an existing result.
+        /// </summary>
+        /// <remarks>
+        /// Organiser only, and only the Organiser who owns the event. Body: finishTimeSeconds
+        /// and position. The enrolment must already have a result.
+        /// </remarks>
+        /// <param name="id">The enrolment ID.</param>
+        /// <response code="200">The updated result.</response>
+        /// <response code="400">The request body is invalid.</response>
+        /// <response code="401">The caller is not logged in.</response>
+        /// <response code="403">The caller is not an Organiser, or does not own this event.</response>
+        /// <response code="404">The enrolment does not exist, or has no result yet.</response>
+        [HttpPut("enrolments/{id:int}/result")]
+        [Authorize(Roles = "Organiser")]
+        [ProducesResponseType(typeof(ResultResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ResultResponse>> Update(int id, [FromBody] ResultRequest request)
+        {
+            var enrolment = await _db.Enrolments
+                .Include(e => e.Category)
+                    .ThenInclude(c => c!.Event)
+                .Include(e => e.Result)
+                .FirstOrDefaultAsync(e => e.EnrolmentId == id);
+
+            if (enrolment == null)
+            {
+                return NotFound();
+            }
+
+            if (enrolment.Category!.Event!.OrganiserId != _userManager.GetUserId(User))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden);
+            }
+
+            if (enrolment.Result == null)
+            {
+                return NotFound(new { message = "This enrolment has no result yet." });
+            }
+
+            enrolment.Result.FinishTimeSeconds = request.FinishTimeSeconds;
+            enrolment.Result.Position = request.Position;
+            await _db.SaveChangesAsync();
+
+            var response = await _db.Results
+                .AsNoTracking()
+                .Where(r => r.ResultId == enrolment.Result.ResultId)
+                .Select(ToResponse)
+                .FirstAsync();
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Gets the result for one enrolment.
         /// </summary>
         /// <remarks>
@@ -166,6 +223,48 @@ namespace RaceDay.Controllers
             }
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Lists every recorded result for an event.
+        /// </summary>
+        /// <remarks>
+        /// Organiser only, and only the Organiser who owns the event. No request body.
+        /// Ordered by category, then finishing position.
+        /// </remarks>
+        /// <param name="eventId">The event ID.</param>
+        /// <response code="200">An array of results for the event (may be empty).</response>
+        /// <response code="401">The caller is not logged in.</response>
+        /// <response code="403">The caller is not an Organiser, or does not own this event.</response>
+        /// <response code="404">No event exists with that ID.</response>
+        [HttpGet("events/{eventId:int}/results")]
+        [Authorize(Roles = "Organiser")]
+        [ProducesResponseType(typeof(List<ResultResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<ResultResponse>>> GetByEvent(int eventId)
+        {
+            var ev = await _db.Events.AsNoTracking().FirstOrDefaultAsync(e => e.EventId == eventId);
+            if (ev == null)
+            {
+                return NotFound();
+            }
+
+            if (ev.OrganiserId != _userManager.GetUserId(User))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden);
+            }
+
+            var list = await _db.Results
+                .AsNoTracking()
+                .Where(r => r.Enrolment!.Category!.EventId == eventId)
+                .OrderBy(r => r.Enrolment!.Category!.Name)
+                .ThenBy(r => r.Position)
+                .Select(ToResponse)
+                .ToListAsync();
+
+            return Ok(list);
         }
 
         /// <summary>
