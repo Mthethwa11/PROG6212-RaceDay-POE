@@ -1,0 +1,113 @@
+@model EventDetailsViewModel
+@{
+    var ev = Model.Event;
+    ViewData["Title"] = ev.Name;
+    var returnUrl = $"/events/{ev.EventId}";
+}
+
+<a class="small" asp-controller="Home" asp-action="Index">&larr; All events</a>
+
+<div class="mt-2 mb-4">
+    @if (!string.IsNullOrEmpty(ev.BannerUrl))
+    {
+        <img class="event-banner" src="@ev.BannerUrl" alt="Banner for @ev.Name" />
+    }
+    else
+    {
+        <div class="event-banner-placeholder">@ev.EventType.ToUpperInvariant()</div>
+    }
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <span class="type-badge type-@ev.EventType.ToLowerInvariant()">@ev.EventType</span>
+        <h1 class="mt-2 mb-3">@ev.Name</h1>
+
+        @if (!string.IsNullOrWhiteSpace(ev.Description))
+        {
+            <div class="card">
+                <div class="card-body p-4 event-description">@ev.Description</div>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body p-4">
+                <dl class="event-facts mb-0">
+                    <dt>Date</dt>
+                    <dd>@ev.EventDate.ToString("dddd, d MMMM yyyy")</dd>
+                    <dt>Location</dt>
+                    <dd>@ev.Location</dd>
+                    <dt>Distance</dt>
+                    <dd>@ev.DistanceKm.ToString("0.##") km</dd>
+                    <dt>Organiser</dt>
+                    <dd class="mb-0">@ev.OrganiserName</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="h3 mt-5 mb-3">Choose your category</h2>
+
+@if (Model.IsPast)
+{
+    <div class="alert alert-info">This event has already taken place, so it's no longer open for entries.</div>
+}
+
+@if (!ev.Categories.Any())
+{
+    <div class="card">
+        <div class="card-body empty-state">
+            <h3 class="h5">No categories yet</h3>
+            <p class="mb-0">The organiser hasn't opened entries for this event yet.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        @foreach (var c in ev.Categories.OrderBy(c => c.DistanceKm))
+        {
+            var enrolled = Model.EnrolledCategoryIds.Contains(c.CategoryId);
+            <div class="col">
+                <div class="card category-card h-100">
+                    <div class="card-body d-flex flex-column p-4">
+                        <h3 class="h5">@c.Name</h3>
+                        <div class="category-price">@(c.Price == 0 ? "Free" : "R " + c.Price.ToString("N2"))</div>
+                        <ul class="list-unstyled text-muted small my-3">
+                            <li>@c.DistanceKm.ToString("0.##") km</li>
+                            <li>Up to @c.MaxParticipants participants</li>
+                        </ul>
+
+                        <div class="mt-auto">
+                            @if (Model.IsPast)
+                            {
+                                <span class="status-badge status-completed">Event finished</span>
+                            }
+                            else if (Model.IsParticipant && enrolled)
+                            {
+                                <span class="status-badge status-confirmed">You're enrolled</span>
+                            }
+                            else if (Model.IsParticipant)
+                            {
+                                <form asp-controller="Events" asp-action="Enrol" asp-route-id="@ev.EventId" asp-route-categoryId="@c.CategoryId" method="post">
+                                    <button type="submit" class="btn btn-primary w-100">Enter this category</button>
+                                </form>
+                            }
+                            else if (Model.IsGuest)
+                            {
+                                <a class="btn btn-primary w-100" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl">Log in to enter</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Log in with a Participant account to enter.</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
