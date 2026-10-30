@@ -1,0 +1,66 @@
+@model CategoriesPageViewModel
+@{
+    ViewData["Title"] = "Categories";
+    ViewData["Tab"] = "Categories";
+}
+
+<partial name="_EventTabs" model="Model.Event" />
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <p class="text-muted mb-0">The distances or age groups people can enter for this event.</p>
+    <a class="btn btn-primary" asp-action="Create" asp-route-eventId="@Model.Event.EventId">Add category</a>
+</div>
+
+@if (!Model.Rows.Any())
+{
+    <div class="card">
+        <div class="card-body empty-state">
+            <h2 class="h4">No categories yet</h2>
+            <p>Participants choose a category when they enter, so add at least one.</p>
+            <a class="btn btn-primary" asp-action="Create" asp-route-eventId="@Model.Event.EventId">Add category</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-raceday align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Distance</th>
+                        <th>Price</th>
+                        <th style="min-width: 10rem;">Enrolled</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.Rows)
+                    {
+                        var c = row.Category;
+                        var percent = c.MaxParticipants > 0 ? Math.Min(100, row.Enrolled * 100 / c.MaxParticipants) : 0;
+                        <tr>
+                            <td class="fw-semibold">@c.Name</td>
+                            <td>@c.DistanceKm.ToString("0.##") km</td>
+                            <td>R @c.Price.ToString("N2")</td>
+                            <td>
+                                <div class="small mb-1">@row.Enrolled of @c.MaxParticipants</div>
+                                <div class="progress"><div class="progress-bar" style="width: @(percent)%"></div></div>
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-outline-secondary btn-sm" asp-action="Edit" asp-route-eventId="@Model.Event.EventId" asp-route-id="@c.CategoryId">Edit</a>
+                                <form asp-action="Delete" asp-route-eventId="@Model.Event.EventId" asp-route-id="@c.CategoryId" method="post" class="d-inline"
+                                      onsubmit="return confirm('Delete this category?');">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm"
+                                            disabled="@(row.Enrolled > 0)"
+                                            title="@(row.Enrolled > 0 ? "A category with enrolments can't be deleted" : "Delete this category")">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

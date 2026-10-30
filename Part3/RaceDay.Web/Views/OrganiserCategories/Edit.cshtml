@@ -1,0 +1,26 @@
+@model CategoryFormViewModel
+@{
+    ViewData["Title"] = "Edit category";
+    ViewData["Tab"] = "Categories";
+    var ev = (EventDto)ViewData["Event"]!;
+}
+
+<partial name="_EventTabs" model="ev" />
+
+<div class="card">
+    <div class="card-body p-4">
+        <h3 class="h5 mb-3">Edit category</h3>
+        <form asp-action="Edit" asp-route-eventId="@ev.EventId" asp-route-id="@Model.CategoryId" method="post">
+            <partial name="_CategoryForm" model="Model" />
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Save changes</button>
+                <a class="btn btn-outline-secondary" asp-action="Index" asp-route-eventId="@ev.EventId">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
