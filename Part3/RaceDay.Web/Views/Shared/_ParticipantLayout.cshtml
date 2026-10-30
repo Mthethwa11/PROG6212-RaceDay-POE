@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/participant.css" asp-append-version="true" />
 </head>
 <body class="layout-participant">
     <header>
@@ -26,8 +27,16 @@
                 <div class="collapse navbar-collapse" id="mainNav">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link @(controller == "Home" && action == "Index" ? "active" : "")"
+                            <a class="nav-link @((controller == "Home" || controller == "Events") ? "active" : "")"
                                asp-controller="Home" asp-action="Index">Events</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(controller == "MyEvents" ? "active" : "")"
+                               asp-controller="MyEvents" asp-action="Index">My events</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(controller == "MyResults" ? "active" : "")"
+                               asp-controller="MyResults" asp-action="Index">My results</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav ms-auto align-items-md-center">
