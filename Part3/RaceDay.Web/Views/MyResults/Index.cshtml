@@ -1,0 +1,63 @@
+@model MyResultsViewModel
+@{
+    ViewData["Title"] = "My results";
+}
+
+@functions {
+    private static string Podium(int? position) => position switch
+    {
+        1 => "podium-1",
+        2 => "podium-2",
+        3 => "podium-3",
+        _ => ""
+    };
+}
+
+<h1 class="mb-1">My results</h1>
+<p class="text-muted mb-4">Your race history across every completed event.</p>
+
+@if (!string.IsNullOrEmpty(Model.LoadError))
+{
+    <div class="alert alert-warning">@Model.LoadError</div>
+}
+
+@if (!Model.Rows.Any())
+{
+    <div class="card">
+        <div class="card-body empty-state">
+            <h2 class="h4">No results yet</h2>
+            <p class="mb-0">Your finish times and positions will appear here after an organiser records them.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-raceday align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Finish time</th>
+                        <th>Position</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.Rows)
+                    {
+                        var r = row.Result;
+                        <tr>
+                            <td class="fw-semibold">@r.EventName</td>
+                            <td>@(row.EventDate.HasValue ? row.EventDate.Value.ToString("d MMM yyyy") : "-")</td>
+                            <td>@r.CategoryName</td>
+                            <td class="fw-semibold">@r.FinishTimeText</td>
+                            <td><span class="position-badge @Podium(r.Position)">@r.PositionText</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
