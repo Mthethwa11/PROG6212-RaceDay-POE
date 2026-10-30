@@ -33,6 +33,12 @@ namespace RaceDay.Dtos
         public int? Position { get; set; }
         public DateTime RecordedAt { get; set; }
 
+        /// <summary>
+        /// How many results have been recorded in the same category, so a position can be
+        /// shown as, for example, "47th of 312".
+        /// </summary>
+        public int TotalFinishers { get; set; }
+
         /// <summary>The finish time as hours:minutes:seconds.</summary>
         public string? FinishTime => FinishTimeSeconds.HasValue
             ? TimeSpan.FromSeconds(FinishTimeSeconds.Value).ToString(@"hh\:mm\:ss")
