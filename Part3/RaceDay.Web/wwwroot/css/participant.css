@@ -1,0 +1,87 @@
+/* Participant-facing styles: event cards, filters, event detail, results */
+
+.filter-bar {
+    background: #fff;
+    border-radius: .9rem;
+    box-shadow: 0 4px 18px rgba(11, 31, 58, .08);
+    padding: 1rem 1.25rem;
+}
+
+.event-card {
+    overflow: hidden;
+    height: 100%;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.event-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(11, 31, 58, .16);
+}
+.card-img-wrap { position: relative; }
+.event-card-img { width: 100%; height: 170px; object-fit: cover; display: block; }
+.event-card-placeholder,
+.event-banner-placeholder {
+    background: linear-gradient(135deg, var(--rd-navy) 0%, var(--rd-navy-2) 55%, var(--rd-orange) 150%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: .12em;
+}
+.event-card-placeholder { height: 170px; font-size: 2.2rem; }
+.event-date-chip {
+    position: absolute;
+    top: .75rem;
+    left: .75rem;
+    background: var(--rd-lime);
+    color: var(--rd-navy);
+    border-radius: .5rem;
+    padding: .2rem .65rem;
+    font-weight: 700;
+    font-size: .8rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.event-banner {
+    width: 100%;
+    height: 340px;
+    object-fit: cover;
+    border-radius: 1rem;
+    display: block;
+}
+.event-banner-placeholder { height: 240px; border-radius: 1rem; font-size: 3.5rem; }
+
+.event-facts dt {
+    color: var(--rd-muted);
+    font-weight: 600;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+.event-facts dd { margin-bottom: .9rem; font-weight: 500; }
+.event-description { white-space: pre-line; }
+
+.category-card { border-top: 4px solid var(--rd-orange); }
+.category-price {
+    font-family: var(--font-heading);
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--rd-navy);
+    line-height: 1.1;
+}
+
+.position-badge {
+    display: inline-block;
+    padding: .2rem .7rem;
+    border-radius: 999px;
+    background: #EEF1F7;
+    color: var(--rd-navy);
+    font-weight: 700;
+    font-size: .85rem;
+}
+.podium-1 { background: #FFF0B3; color: #7A5B00; }
+.podium-2 { background: #E8ECF2; color: #4B5565; }
+.podium-3 { background: #F6DCC8; color: #8A4B1B; }
