@@ -1,0 +1,35 @@
+/* Organiser-only styles: event tabs, progress bars, results entry */
+
+.btn-outline-primary {
+    color: var(--rd-orange-dark);
+    border-color: var(--rd-orange);
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    color: #fff;
+    background-color: var(--rd-orange);
+    border-color: var(--rd-orange);
+}
+
+.event-tabs { border-bottom: 2px solid #DFE4EE; }
+.event-tabs .nav-link {
+    color: var(--rd-muted);
+    font-weight: 600;
+    background: transparent;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+}
+.event-tabs .nav-link:hover { color: var(--rd-navy); }
+.event-tabs .nav-link.active {
+    color: var(--rd-navy);
+    border-bottom-color: var(--rd-orange);
+}
+
+.progress { background-color: #E6EAF2; height: 6px; }
+.progress-bar { background-color: var(--rd-orange); }
+
+.result-time { display: inline-flex; align-items: center; gap: .25rem; }
+.result-input { width: 4.5rem; text-align: center; }
+.result-position { width: 5.5rem; text-align: center; }

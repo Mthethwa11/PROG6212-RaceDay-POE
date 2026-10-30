@@ -1,0 +1,32 @@
+@model EventDto
+@{
+    var tab = ViewData["Tab"] as string;
+}
+
+<div class="mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+        <div>
+            <h2 class="h3 mb-1">@Model.Name</h2>
+            <div class="text-muted">
+                <span class="type-badge type-@Model.EventType.ToLowerInvariant()">@Model.EventType</span>
+                &nbsp;@Model.EventDate.ToString("ddd, d MMM yyyy") &middot; @Model.Location
+            </div>
+        </div>
+        <a class="btn btn-outline-secondary btn-sm" asp-controller="OrganiserEvents" asp-action="Index">All events</a>
+    </div>
+
+    <ul class="nav nav-tabs event-tabs mt-3">
+        <li class="nav-item">
+            <a class="nav-link @(tab == "Categories" ? "active" : "")"
+               asp-controller="OrganiserCategories" asp-action="Index" asp-route-eventId="@Model.EventId">Categories</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(tab == "Enrolments" ? "active" : "")"
+               asp-controller="OrganiserEnrolments" asp-action="Index" asp-route-eventId="@Model.EventId">Enrolments</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(tab == "Results" ? "active" : "")"
+               asp-controller="OrganiserResults" asp-action="Index" asp-route-eventId="@Model.EventId">Results</a>
+        </li>
+    </ul>
+</div>
