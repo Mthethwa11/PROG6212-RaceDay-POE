@@ -37,7 +37,7 @@ else
                         <th>Distance</th>
                         <th class="text-end">Enrolments</th>
                         <th>Status</th>
-                        <th class="text-end">Actions</th>
+                        <th class="text-end">Manage</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -73,6 +73,9 @@ else
                                 }
                             </td>
                             <td class="text-end text-nowrap">
+                                <a class="btn btn-outline-primary btn-sm" asp-controller="OrganiserCategories" asp-action="Index" asp-route-eventId="@e.EventId">Categories</a>
+                                <a class="btn btn-outline-primary btn-sm" asp-controller="OrganiserEnrolments" asp-action="Index" asp-route-eventId="@e.EventId">Enrolments</a>
+                                <a class="btn btn-outline-primary btn-sm" asp-controller="OrganiserResults" asp-action="Index" asp-route-eventId="@e.EventId">Results</a>
                                 <a class="btn btn-outline-secondary btn-sm" asp-action="Edit" asp-route-id="@e.EventId">Edit</a>
                                 <a class="btn btn-outline-danger btn-sm" asp-action="Delete" asp-route-id="@e.EventId">Delete</a>
                             </td>
