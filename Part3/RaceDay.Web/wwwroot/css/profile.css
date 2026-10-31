@@ -1,0 +1,25 @@
+/* Profile picture / avatar */
+.avatar {
+    border-radius: 50%;
+    object-fit: cover;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+.avatar-sm { width: 32px; height: 32px; }
+.avatar-lg { width: 120px; height: 120px; }
+
+.avatar-initial {
+    background: var(--rd-orange);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-weight: 700;
+}
+.avatar-sm.avatar-initial { font-size: 1.05rem; }
+.avatar-lg.avatar-initial { font-size: 3.2rem; }
+
+.navbar-raceday .avatar,
+.org-sidebar .avatar { border: 2px solid var(--rd-lime); }

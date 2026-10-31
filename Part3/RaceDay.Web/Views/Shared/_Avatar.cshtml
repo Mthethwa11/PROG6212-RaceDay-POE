@@ -1,0 +1,13 @@
+@{
+    var pictureUrl = Context.Session.GetProfilePictureUrl();
+    var fullName = Context.Session.GetFullName() ?? "?";
+    var initial = fullName.Length > 0 ? fullName.Substring(0, 1).ToUpperInvariant() : "?";
+}
+@if (!string.IsNullOrEmpty(pictureUrl))
+{
+    <img class="avatar avatar-sm" src="@pictureUrl" alt="" />
+}
+else
+{
+    <span class="avatar avatar-sm avatar-initial">@initial</span>
+}
