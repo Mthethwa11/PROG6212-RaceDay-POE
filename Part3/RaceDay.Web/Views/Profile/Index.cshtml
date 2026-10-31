@@ -1,0 +1,76 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "My profile";
+    var initial = string.IsNullOrEmpty(Model.FullName) ? "?" : Model.FullName.Substring(0, 1).ToUpperInvariant();
+}
+
+<h1 class="mb-1">My profile</h1>
+<p class="text-muted mb-4">Update your details and choose a profile picture.</p>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body p-4 text-center">
+                @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
+                {
+                    <img class="avatar avatar-lg mb-3" src="@Model.ProfilePictureUrl" alt="Your profile picture" />
+                }
+                else
+                {
+                    <span class="avatar avatar-lg avatar-initial mb-3">@initial</span>
+                }
+
+                <h2 class="h5 mb-1">@Model.FullName</h2>
+                @if (!string.IsNullOrEmpty(Model.Role))
+                {
+                    <span class="role-badge">@Model.Role</span>
+                }
+                @if (Model.CreatedAt.HasValue)
+                {
+                    <div class="text-muted small mt-2">Member since @Model.CreatedAt.Value.ToString("MMMM yyyy")</div>
+                }
+
+                <hr />
+
+                <form asp-action="UploadPicture" method="post" enctype="multipart/form-data" class="text-start">
+                    <label for="pictureFile" class="form-label">Profile picture</label>
+                    <input id="pictureFile" name="pictureFile" type="file" class="form-control mb-2"
+                           accept="image/jpeg,image/png,image/webp" required />
+                    <div class="form-text mb-3">JPEG, PNG or WebP, up to 5 MB.</div>
+                    <button type="submit" class="btn btn-primary w-100">Upload picture</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body p-4">
+                <h2 class="h4 mb-3">Personal information</h2>
+
+                <form asp-action="UpdateDetails" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" autocomplete="name" />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" autocomplete="email" />
+                        <div class="form-text">You'll use this email to log in.</div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
