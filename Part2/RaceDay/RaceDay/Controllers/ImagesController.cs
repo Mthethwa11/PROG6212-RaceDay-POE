@@ -114,6 +114,77 @@ namespace RaceDay.Controllers
             }
         }
 
+        /// <summary>
+        /// Uploads (or replaces) the logged-in user's profile picture.
+        /// </summary>
+        /// <remarks>
+        /// Any logged-in user. Send the image as multipart/form-data in a field called "file"
+        /// (JPEG, PNG or WebP, up to 5 MB).
+        /// </remarks>
+        /// <param name="file">The image file.</param>
+        /// <response code="200">The picture was stored. Its public URL is returned.</response>
+        /// <response code="400">No file, a file that is too large, or not a JPEG, PNG or WebP image.</response>
+        /// <response code="401">The caller is not logged in.</response>
+        [HttpPost("users/me/picture")]
+        [Authorize]
+        [Consumes("multipart/form-data")]
+        [RequestSizeLimit(6 * 1024 * 1024)]
+        [ProducesResponseType(typeof(ImageUploadResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<ImageUploadResponse>> UploadProfilePicture(IFormFile? file)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var problem = await ValidateImageAsync(file);
+            if (problem != null)
+            {
+                return BadRequest(new { message = problem });
+            }
+
+            try
+            {
+                var blobName = $"{user.Id}/{Guid.NewGuid():N}{AllowedTypes[file!.ContentType]}";
+
+                string url;
+                await using (var stream = file.OpenReadStream())
+                {
+                    url = await _blobs.UploadAsync(_blobs.ProfilePicturesContainer, blobName, stream, file.ContentType);
+                }
+
+                var oldUrl = user.ProfilePictureUrl;
+                user.ProfilePictureUrl = url;
+
+                var update = await _userManager.UpdateAsync(user);
+                if (!update.Succeeded)
+                {
+                    await _blobs.DeleteAsync(url);
+                    return BadRequest(new { message = "We couldn't save your profile picture. Please try again." });
+                }
+
+                if (!string.IsNullOrEmpty(oldUrl))
+                {
+                    await _blobs.DeleteAsync(oldUrl);
+                }
+
+                return Ok(new ImageUploadResponse { Url = url });
+            }
+            catch (BlobStorageNotConfiguredException)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                    new { message = "Image storage is not set up on the server yet." });
+            }
+            catch (RequestFailedException)
+            {
+                return StatusCode(StatusCodes.Status502BadGateway,
+                    new { message = "Image storage is unavailable right now. Please try again." });
+            }
+        }
+
         // ------------------------------------------------------------ validation
 
         private static async Task<string?> ValidateImageAsync(IFormFile? file)
