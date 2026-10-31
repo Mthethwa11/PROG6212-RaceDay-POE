@@ -48,6 +48,7 @@ Browser  ->  RaceDay.Web (MVC, Part3)  ->  RaceDay API (Part2)  ->  SQL Server
 - Event detail page with banner and categories; enrol by choosing a category (recorded immediately).
 - My events: every enrolment with its colour-coded status, and cancel for upcoming events.
 - My results: event, date, category, finish time and position such as "47th of 312".
+- Profile page: view and update your name and email, and upload a profile picture (stored in Azure Blob Storage through the API).
 
 ## Running it locally (Visual Studio)
 
