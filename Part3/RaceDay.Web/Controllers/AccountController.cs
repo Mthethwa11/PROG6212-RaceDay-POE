@@ -88,6 +88,10 @@ public class AccountController : Controller
         var user = result.Data;
         HttpContext.Session.SignIn(user.UserId, user.Role, user.FullName);
 
+        // Load the profile picture (if there is one) so it can be shown in the navigation bar.
+        var me = await _api.GetAsync<UserProfileDto>("api/users/me");
+        HttpContext.Session.SetProfilePictureUrl(me.Success ? me.Data?.ProfilePictureUrl : null);
+
         if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
         {
             return LocalRedirect(model.ReturnUrl);
