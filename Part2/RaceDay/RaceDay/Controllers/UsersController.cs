@@ -93,6 +93,7 @@ namespace RaceDay.Controllers
             FullName = user.FullName,
             Email = user.Email ?? string.Empty,
             Role = HttpContext.Session.GetString("Role") ?? string.Empty,
+            ProfilePictureUrl = user.ProfilePictureUrl,
             CreatedAt = user.CreatedAt
         };
     }
@@ -106,6 +107,10 @@ namespace RaceDay.Controllers
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
+
+        /// <summary>Public URL of the profile picture in Azure Blob Storage, or null if none has been uploaded.</summary>
+        public string? ProfilePictureUrl { get; set; }
+
         public DateTime CreatedAt { get; set; }
     }
 }
