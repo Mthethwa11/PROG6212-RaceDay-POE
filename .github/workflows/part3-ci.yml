@@ -1,0 +1,75 @@
+name: Part 3 - validate structure, build MVC and Docker image
+
+on:
+  push:
+    paths:
+      - "Part3/**"
+      - ".github/workflows/part3-ci.yml"
+  pull_request:
+    paths:
+      - "Part3/**"
+      - ".github/workflows/part3-ci.yml"
+  workflow_dispatch:
+
+jobs:
+  validate-structure:
+    name: Validate Part 3 repository structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required Part 3 files and folders exist
+        run: |
+          set -e
+          missing=0
+          for f in \
+            Part3/README.md \
+            Part3/docker-compose.yml \
+            Part3/RaceDay.Web/RaceDay.Web.csproj \
+            Part3/RaceDay.Web/Program.cs \
+            Part3/RaceDay.Web/Dockerfile \
+            Part3/RaceDay.Web/appsettings.json
+          do
+            if [ ! -f "$f" ]; then echo "Missing file: $f"; missing=1; fi
+          done
+          for d in Controllers Models Views Services Filters wwwroot; do
+            if [ ! -d "Part3/RaceDay.Web/$d" ]; then echo "Missing folder: Part3/RaceDay.Web/$d"; missing=1; fi
+          done
+          if [ "$missing" -ne 0 ]; then exit 1; fi
+          echo "Part 3 structure is valid."
+
+      - name: Check the MVC project has no database or Azure access
+        run: |
+          set -e
+          if grep -rniE "EntityFrameworkCore|SqlClient|Azure\.Storage" Part3/RaceDay.Web/RaceDay.Web.csproj Part3/RaceDay.Web --include=*.cs --include=*.csproj; then
+            echo "The MVC project must not reference EF Core, SQL or Azure Storage."
+            exit 1
+          fi
+          echo "MVC project only talks to the API."
+
+  build-mvc:
+    name: Build the MVC project
+    runs-on: ubuntu-latest
+    needs: validate-structure
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore Part3/RaceDay.Web/RaceDay.Web.csproj
+
+      - name: Build
+        run: dotnet build Part3/RaceDay.Web/RaceDay.Web.csproj --configuration Release --no-restore
+
+  build-docker-image:
+    name: Build the Docker image
+    runs-on: ubuntu-latest
+    needs: build-mvc
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t raceday-web Part3/RaceDay.Web
