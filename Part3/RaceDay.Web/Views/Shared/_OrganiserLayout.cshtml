@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/organiser.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 </head>
 <body class="layout-organiser">
     <div class="org-shell">
@@ -28,10 +29,12 @@
                    asp-controller="OrganiserEvents" asp-action="Index">My events</a>
                 <a class="org-link @(controller == "OrganiserEvents" && action == "Create" ? "active" : "")"
                    asp-controller="OrganiserEvents" asp-action="Create">Create event</a>
+                <a class="org-link @(controller == "Profile" ? "active" : "")"
+                   asp-controller="Profile" asp-action="Index">My profile</a>
             </nav>
 
             <div class="org-user mt-auto">
-                <div class="org-user-name">@Context.Session.GetFullName()</div>
+                <div class="org-user-name d-flex align-items-center gap-2"><partial name="_Avatar" /><span>@Context.Session.GetFullName()</span></div>
                 <form asp-controller="Account" asp-action="Logout" method="post">
                     <button type="submit" class="btn btn-outline-light btn-sm w-100">Log out</button>
                 </form>
