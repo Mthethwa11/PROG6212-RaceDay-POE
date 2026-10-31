@@ -8,6 +8,7 @@ public static class SessionKeys
     public const string UserId = "UserId";
     public const string Role = "Role";
     public const string FullName = "FullName";
+    public const string ProfilePictureUrl = "ProfilePictureUrl";
 
     // The cookies issued by the Part 2 API (login cookie + API session cookie).
     // The MVC app forwards them on every API call so the API knows who the user is.
@@ -40,6 +41,18 @@ public static class UserSessionExtensions
     public static string? GetRole(this ISession session) => session.GetString(SessionKeys.Role);
 
     public static string? GetFullName(this ISession session) => session.GetString(SessionKeys.FullName);
+
+    public static string? GetProfilePictureUrl(this ISession session) =>
+        session.GetString(SessionKeys.ProfilePictureUrl);
+
+    /// <summary>Remembers the profile picture URL so the navigation bar can show it. Null or empty removes it.</summary>
+    public static void SetProfilePictureUrl(this ISession session, string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            session.Remove(SessionKeys.ProfilePictureUrl);
+        else
+            session.SetString(SessionKeys.ProfilePictureUrl, url);
+    }
 
     public static bool IsOrganiser(this ISession session) =>
         string.Equals(session.GetRole(), Roles.Organiser, StringComparison.OrdinalIgnoreCase);
