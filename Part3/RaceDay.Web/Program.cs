@@ -18,17 +18,32 @@ builder.Services.AddSession(options =>
 });
 
 // The API address comes from configuration (appsettings.json) and can be overridden
-// with the environment variable Api__BaseUrl, which is how Docker will set it.
+// with the environment variable Api__BaseUrl, which is how Docker sets it.
 var apiBaseUrl = builder.Configuration["Api:BaseUrl"]
     ?? throw new InvalidOperationException("Api:BaseUrl is not configured.");
+
+// Off by default. Only switched on (Api__AllowUntrustedCertificate=true) when the container
+// talks to the API's local development certificate, which the container does not trust.
+var allowUntrustedCertificate = builder.Configuration.GetValue<bool>("Api:AllowUntrustedCertificate");
 
 builder.Services.AddHttpClient("RaceDayApi", client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl.TrimEnd('/') + "/");
     client.Timeout = TimeSpan.FromSeconds(30);
 })
-// We pass the API cookies along ourselves (stored in the MVC session), so the handler must not manage them.
-.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false });
+.ConfigurePrimaryHttpMessageHandler(() =>
+{
+    // We pass the API cookies along ourselves (stored in the MVC session), so the handler must not manage them.
+    var handler = new HttpClientHandler { UseCookies = false };
+
+    if (allowUntrustedCertificate)
+    {
+        handler.ServerCertificateCustomValidationCallback =
+            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+    }
+
+    return handler;
+});
 
 builder.Services.AddScoped<IApiClient, ApiClient>();
 
