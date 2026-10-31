@@ -2,8 +2,9 @@
 
 [![Validate Repository Structure](https://github.com/Mthethwa11/PROG6212-RaceDay-POE/actions/workflows/validate-structure.yml/badge.svg)](https://github.com/Mthethwa11/PROG6212-RaceDay-POE/actions/workflows/validate-structure.yml)
 [![Build and Test](https://github.com/Mthethwa11/PROG6212-RaceDay-POE/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/Mthethwa11/PROG6212-RaceDay-POE/actions/workflows/build-and-test.yml)
+![Part 3 CI](https://github.com/Mthethwa11/PROG6212-RaceDay-POE/actions/workflows/part3-ci.yml/badge.svg)
 
-**PROG6212 Portfolio of Evidence** — Part 1: System Planning and Database · Part 2: RESTful API Development
+**PROG6212 Portfolio of Evidence** — Part 1: System Planning and Database · Part 2: RESTful API Development · Part 3: MVC Web Application, Azure Blob Storage and Docker
 
 ## About the System
 
@@ -12,7 +13,7 @@ RaceDay is a web-based event management system built for the South African road 
 Event **Organisers** create and manage events, categories, and participant results. **Participants** browse upcoming events, enter events by choosing a category, and track their personal results.
 
 - **Part 1** (planning): ERD, API endpoint plan, SQL script, data dictionary.
-- **Part 2** (this submission): an ASP.NET Core API with Entity Framework Core (Code-First), role-based session authentication, Swagger, 47 unit tests, and a GitHub Actions workflow that builds the project and runs the tests on every push.
+- **Part 2** (Part 2): an ASP.NET Core API with Entity Framework Core (Code-First), role-based session authentication, Swagger, 47 unit tests, and a GitHub Actions workflow that builds the project and runs the tests on every push.
 
 ## Roles
 
@@ -174,3 +175,79 @@ The Part 1 ERD, SQL script and endpoint plan were followed, with these deliberat
 ## AI Tool Disclosure
 
 AI tools (DeepSeek) were used to help plan and assist in debugging and to troubleshoot errors reviewing code. All code was done, run, and tested by me, and I can explain the design decisions and code structure in the accompanying video walkthroughs.
+---
+
+## Part 3: MVC Web Application, Azure Blob Storage and Docker
+
+Part 3 is the web front end for RaceDay: an ASP.NET Core MVC app in [`Part3/RaceDay.Web`](Part3/RaceDay.Web) that
+consumes the Part 2 API. It has **no database access and no duplicated business logic**. Every piece of data and every
+file upload goes through the API, and image storage (Azure Blob Storage) lives inside the API. The MVC app never talks to Azure.
+
+**Demo video (unlisted YouTube):** [PASTE VIDEO LINK HERE]
+
+![Part 3 CI](https://github.com/Mthethwa11/PROG6212-RaceDay-POE/actions/workflows/part3-ci.yml/badge.svg)
+
+![CI run](Part3/docs/ci-green.png)
+
+The full Part 3 documentation is in [`Part3/README.md`](Part3/README.md).
+
+### Architecture
+
+```
+Browser  ->  RaceDay.Web (MVC, Part3)  ->  RaceDay API (Part2)  ->  SQL Server
+                                                     |
+                                                     +-------->  Azure Blob Storage (images)
+```
+
+- The MVC app keeps the user's ID and role in its own session and sends the cookies the API issues with every API call.
+- Three layouts give each audience its own interface: guest, Participant (top navigation bar) and Organiser (sidebar console).
+  Protected pages redirect unauthenticated users to the login page, and the wrong role gets an access-denied page.
+- Event banners and profile pictures are uploaded to the **API**, which validates them, stores them in Azure Blob Storage and saves
+  only the public URL in the database. The MVC app displays the image from that URL.
+
+### Features
+
+**Organiser:** dashboard (events, upcoming dates, enrolments per event) - create, edit and delete events with a banner image -
+category management - enrolments per event with colour-coded status - results entry (finish time and position).
+
+**Participant:** home page with upcoming events and search, type and date filters - event detail with categories and one-click
+enrolment - My events with colour-coded status and cancel - My results (event, date, category, finish time and position such as
+"47th of 312") - profile page to update details and upload a profile picture.
+
+### Run it with Docker
+
+The container runs the MVC app only. The Part 2 API must be running on your PC (<https://localhost:7297>), because the container
+calls it through `host.docker.internal`. Run these from the repository root.
+
+One command (Docker Compose):
+
+```
+docker compose -f Part3/docker-compose.yml up --build
+```
+
+Or with plain Docker:
+
+```
+docker build -t raceday-web Part3/RaceDay.Web
+docker run --rm -p 8080:8080 -e Api__BaseUrl=https://host.docker.internal:7297 -e Api__AllowUntrustedCertificate=true --name raceday-web raceday-web
+```
+
+Then open <http://localhost:8080>. `Api__AllowUntrustedCertificate=true` is needed only because the API uses the local ASP.NET
+development certificate, which a container does not trust. It is off by default and is for local demonstration only.
+
+### Run it locally (Visual Studio)
+
+1. In Package Manager Console (default project `RaceDay`) run `Update-Database`.
+2. Add your Azure storage connection string to the API's User Secrets (it is never committed):
+   `AzureBlob:ConnectionString`, with containers `event-banners` and `profile-pictures` set to public read for blobs.
+3. Set `RaceDay` (API) and `RaceDay.Web` as multiple startup projects. API: <https://localhost:7297> - Web: <https://localhost:7015>.
+
+### CI/CD
+
+`.github/workflows/part3-ci.yml` runs on every push to `Part3/`: it validates the Part 3 repository structure, builds the MVC project
+and builds the Docker image. The Part 2 workflows keep building and testing the API.
+
+### Use of AI assistance
+
+I used an AI assistant (ChatGPT & Deepseek) for reviewing, debugging the code during this part of the project.
+I ran, tested and reviewed the result myself.
