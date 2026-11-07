@@ -172,6 +172,7 @@ The Part 1 ERD, SQL script and endpoint plan were followed, with these deliberat
 
 - **Part 1:** [Watch the Part 1 walkthrough video](https://youtu.be/RfA3ZOpw8js)
 - **Part 2:** [Watch the Part 2 walkthrough video](https://youtu.be/GHIwjM5FKQ8)
+- **Part 2:** [Watch the Part 2 walkthrough video](https://youtu.be/mipZ4Vo5p2A)
 ## AI Tool Disclosure
 
 AI tools (DeepSeek) were used to help plan and assist in debugging and to troubleshoot errors reviewing code. All code was done, run, and tested by me, and I can explain the design decisions and code structure in the accompanying video walkthroughs.

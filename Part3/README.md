@@ -8,7 +8,7 @@ Part 3 is the ASP.NET Core MVC web application (`Part3/RaceDay.Web`). It has **n
 duplicated business logic**: every piece of data and every file upload goes through the Part 2 API.
 Image storage (Azure Blob Storage) lives inside the API; the MVC app never talks to Azure.
 
-**Demo video (unlisted YouTube):** [PASTE VIDEO LINK HERE]
+**Demo video (unlisted YouTube):** [https://youtu.be/mipZ4Vo5p2A]
 
 **CI status:** ![CI screenshot](docs/ci-green.png)
 <!-- Replace docs/ci-green.png with the screenshot of the green GitHub Actions run, saved in Part3/docs/ -->
